@@ -1,0 +1,14 @@
+# Godot 4+
+.godot/
+export.cfg
+export_presets.cfg
+*.tmp
+/android/
+
+# C#-specific ignores
+.mono/
+bin/
+obj/
+
+# VSCode-specific
+.vscode/
