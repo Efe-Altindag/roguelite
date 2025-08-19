@@ -1,10 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://b6j6jqcpylats"]
+[gd_scene load_steps=8 format=3 uid="uid://b6j6jqcpylats"]
 
 [ext_resource type="Script" uid="uid://clye1dgni81as" path="res://Player.cs" id="1_gnttm"]
-[ext_resource type="Texture2D" uid="uid://ib0y8iangxth" path="res://player.jpg" id="2_ea244"]
+[ext_resource type="Texture2D" uid="uid://dgm84p11c3g8a" path="res://character.png" id="2_q1j2t"]
+[ext_resource type="PackedScene" uid="uid://syfx5i5j0p4u" path="res://health_component.tscn" id="3_xh7rh"]
+[ext_resource type="PackedScene" uid="uid://ottrnuqhf5um" path="res://enemy.tscn" id="4_6qhfl"]
+[ext_resource type="PackedScene" uid="uid://cock6clpknbx3" path="res://sword.tscn" id="4_q1j2t"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ea244"]
-size = Vector2(261, 193)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_q1j2t"]
+radius = 9.58759
+height = 28.4047
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xh7rh"]
 size = Vector2(1367, 28)
@@ -12,19 +16,31 @@ size = Vector2(1367, 28)
 [node name="testSpace" type="Node2D"]
 
 [node name="Player" type="CharacterBody2D" parent="."]
+scale = Vector2(-0.389016, 0.518581)
+disable_mode = 2
 script = ExtResource("1_gnttm")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
-scale = Vector2(0.620749, 0.647194)
-texture = ExtResource("2_ea244")
+scale = Vector2(1.55208, 1.26806)
+texture = ExtResource("2_q1j2t")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-position = Vector2(0.5, 0.5)
-scale = Vector2(0.620749, 0.647194)
-shape = SubResource("RectangleShape2D_ea244")
+visible = false
+position = Vector2(0, -5.78502)
+scale = Vector2(-4.55798, -4.75216)
+shape = SubResource("CapsuleShape2D_q1j2t")
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position_smoothing_enabled = true
+position_smoothing_speed = 1.0
+
+[node name="HealthComponent" parent="Player" instance=ExtResource("3_xh7rh")]
+MaxHealth = 2131
+
+[node name="Sword" parent="Player" instance=ExtResource("4_q1j2t")]
+position = Vector2(-71.9765, 40.4951)
+rotation = -3.58316
+scale = Vector2(-11.893, -0.054)
 
 [node name="Wall" type="Node2D" parent="."]
 top_level = true
@@ -95,3 +111,11 @@ offset_right = -746.941
 offset_bottom = -248.394
 scale = Vector2(35.8892, 1.3114)
 color = Color(0.479196, 0.386167, 0.464454, 1)
+
+[node name="Enemy2" parent="." instance=ExtResource("4_6qhfl")]
+position = Vector2(-49, -235)
+collision_layer = 3
+
+[node name="Enemy" parent="." instance=ExtResource("4_6qhfl")]
+position = Vector2(-155, -180)
+collision_layer = 3
