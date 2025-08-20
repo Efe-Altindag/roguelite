@@ -22,19 +22,35 @@ public partial class HealthComponent : Node
         if (CurrentHealth < 0)
             CurrentHealth = 0;
 
-        // Sprite'ı kırmızıya boyama
+        // Sprite'ı kırmızıya boyama (red flash effect)
         var parent = GetParent();
         if (parent != null)
         {
             var sprite = parent.GetNodeOrNull<Sprite2D>("Sprite2D");
+            var animatedSprite = parent.GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+            
             if (sprite != null)
             {
                 sprite.Modulate = new Color(1, 0, 0); // Kırmızı
                 GetTree().CreateTimer(0.1f).Timeout += () => {
                     if (GodotObject.IsInstanceValid(sprite))
                         sprite.Modulate = new Color(1, 1, 1);
-                }; // 0.1 saniye sonra eski haline dön
+                };
             }
+            else if (animatedSprite != null)
+            {
+                animatedSprite.Modulate = new Color(1, 0, 0); // Kırmızı
+                GetTree().CreateTimer(0.1f).Timeout += () => {
+                    if (GodotObject.IsInstanceValid(animatedSprite))
+                        animatedSprite.Modulate = new Color(1, 1, 1);
+                };
+            }
+        }
+
+        // Notify parent (Enemy) to play hurt animation
+        if (GetParent() is Enemy enemy)
+        {
+            enemy.PlayHurtAnimation();
         }
 
         GD.Print($"HealthComponent: Hasar alındı! Kalan Can: {CurrentHealth}");
@@ -42,11 +58,6 @@ public partial class HealthComponent : Node
         if (CurrentHealth <= 0)
         {
             EmitSignal("Died");
-            var parentNode = GetParent();
-            if (parentNode != null)
-                parentNode.QueueFree();
-            else
-                QueueFree();
         }
     }
 }

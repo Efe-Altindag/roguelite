@@ -5,13 +5,18 @@ public partial class Player : CharacterBody2D
 {
     [Export]
     public float Speed = 200f;
-
+    [Export]
+    public float PushForce = 800f; // Force applied to push enemies
+    [Export]
+    public float PushDamping = 5f; // How fast push effects decay
+    
+    private Vector2 _pushVelocity = Vector2.Zero; // Accumulated external forces
     private Hitbox _attackHitbox;
 
     public override void _Ready()
     {
         GD.Print("=== PLAYER _Ready() STARTING ===");
-        // Kamera bul ve aktif et
+        // Find and activate camera
         var cam = GetNodeOrNull<Camera2D>("Camera2D");
         if (cam == null)
         {
@@ -22,7 +27,7 @@ public partial class Player : CharacterBody2D
             cam.MakeCurrent();
         }
 
-        // Sword node'unu bul ve altındaki Hitbox'a eriş
+        // Find Sword node and access its Hitbox child
         var sword = GetNodeOrNull<Node>("Sword");
         if (sword != null)
         {
@@ -105,7 +110,34 @@ public partial class Player : CharacterBody2D
             velocity = velocity.Normalized() * Speed;
         }
 
-        Velocity = velocity;
+        // Total velocity = player movement + push effects
+        Velocity = velocity + _pushVelocity;
         MoveAndSlide();
+
+        // Check collisions and apply push
+        for (int i = 0; i < GetSlideCollisionCount(); i++)
+        {
+            var collision = GetSlideCollision(i);
+            if (collision.GetCollider() is Enemy enemy)
+            {
+                // Calculate push direction (from player to enemy)
+                Vector2 pushDirection = (enemy.GlobalPosition - GlobalPosition);
+                if (pushDirection.Length() < 0.1f) 
+                    pushDirection = Vector2.Right; // Fallback
+                pushDirection = pushDirection.Normalized();
+                
+                // Apply controlled push to enemy
+                enemy.ApplyPush(pushDirection * PushForce * (float)delta);
+            }
+        }
+
+        // Reduce own push effects over time
+        _pushVelocity = _pushVelocity.MoveToward(Vector2.Zero, PushDamping * Speed * (float)delta);
+    }
+
+    // Apply external push forces
+    public void ApplyPush(Vector2 pushVector)
+    {
+        _pushVelocity += pushVector;
     }
 }

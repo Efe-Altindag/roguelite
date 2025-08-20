@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bt6riwknoem0w"
-path="res://.godot/imported/slime-monster.png-5046209e903a90940d8dfe536fa2df64.ctex"
+uid="uid://b3i5mwd7whsts"
+path="res://.godot/imported/Slime3_Hurt_body.png-125aabcced2057d0fd2edb4fafd0d973.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://slime-monster.png"
-dest_files=["res://.godot/imported/slime-monster.png-5046209e903a90940d8dfe536fa2df64.ctex"]
+source_file="res://assets/art/enemies/Slime3/Hurt/Slime3_Hurt_body.png"
+dest_files=["res://.godot/imported/Slime3_Hurt_body.png-125aabcced2057d0fd2edb4fafd0d973.ctex"]
 
 [params]
 

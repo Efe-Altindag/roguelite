@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cock6clpknbx3"]
 
-[ext_resource type="Script" uid="uid://bre6fdrbppomf" path="res://Hitbox.cs" id="1_74bdg"]
+[ext_resource type="Script" uid="uid://bre6fdrbppomf" path="res://scripts/components/Hitbox.cs" id="1_74bdg"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_o8xsq"]
 

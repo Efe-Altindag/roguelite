@@ -13,7 +13,7 @@ config_version=5
 config/name="Roguelite-game"
 run/main_scene="uid://b6j6jqcpylats"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="res://assets/art/environments/icon.svg"
 
 [dotnet]
 

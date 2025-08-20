@@ -1,20 +1,20 @@
 [gd_scene load_steps=6 format=3 uid="uid://ottrnuqhf5um"]
 
-[ext_resource type="PackedScene" uid="uid://syfx5i5j0p4u" path="res://health_component.tscn" id="1_7k104"]
-[ext_resource type="Texture2D" uid="uid://bt6riwknoem0w" path="res://slime-monster.png" id="1_qi2p4"]
-[ext_resource type="Script" uid="uid://h711qlsmstkf" path="res://Hurtbox.cs" id="3_qi2p4"]
+[ext_resource type="PackedScene" uid="uid://syfx5i5j0p4u" path="res://scenes/components/health_component.tscn" id="1_7k104"]
+[ext_resource type="Script" uid="uid://dptnsfromxx2i" path="res://scripts/nodes/Enemy.cs" id="1_lu5c6"]
+[ext_resource type="Script" uid="uid://h711qlsmstkf" path="res://scripts/components/Hurtbox.cs" id="3_qi2p4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4gyqm"]
-radius = 5.47217
+radius = 3.9087
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qi2p4"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fcftc"]
+size = Vector2(18.8421, 19.2105)
 
 [node name="Enemy" type="CharacterBody2D"]
-disable_mode = 1
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(1.12, 1.12)
-texture = ExtResource("1_qi2p4")
+scale = Vector2(0.504411, 0.504411)
+motion_mode = 1
+script = ExtResource("1_lu5c6")
+FollowSpeed = 60.0
 
 [node name="HealthComponent" parent="." instance=ExtResource("1_7k104")]
 MaxHealth = 50
@@ -26,11 +26,11 @@ collision_mask = 0
 script = ExtResource("3_qi2p4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
-position = Vector2(0, -2.27273)
-scale = Vector2(2.90727, 2.90727)
+position = Vector2(0, 1.13636)
+scale = Vector2(3.29299, 3.47348)
 shape = SubResource("CircleShape2D_4gyqm")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -2)
-scale = Vector2(1, 1.28)
-shape = SubResource("RectangleShape2D_qi2p4")
+position = Vector2(0.458329, 0.700006)
+scale = Vector2(0.791666, 0.759999)
+shape = SubResource("RectangleShape2D_fcftc")
