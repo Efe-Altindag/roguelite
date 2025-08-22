@@ -1,10 +1,6 @@
-[gd_scene load_steps=471 format=3 uid="uid://b6j6jqcpylats"]
+[gd_scene load_steps=466 format=3 uid="uid://b6j6jqcpylats"]
 
-[ext_resource type="Script" uid="uid://clye1dgni81as" path="res://scripts/nodes/Player.cs" id="1_gnttm"]
-[ext_resource type="Texture2D" uid="uid://dgm84p11c3g8a" path="res://assets/art/characters/character.png" id="2_q1j2t"]
-[ext_resource type="PackedScene" uid="uid://syfx5i5j0p4u" path="res://scenes/components/health_component.tscn" id="3_xh7rh"]
 [ext_resource type="PackedScene" uid="uid://ottrnuqhf5um" path="res://scenes/enemies/enemy.tscn" id="4_6qhfl"]
-[ext_resource type="PackedScene" uid="uid://cock6clpknbx3" path="res://scenes/characters/sword.tscn" id="4_q1j2t"]
 [ext_resource type="Texture2D" uid="uid://cxxdbex11kf55" path="res://assets/art/enemies/Slime1/Death/Slime1_Death_full.png" id="6_jdex6"]
 [ext_resource type="Texture2D" uid="uid://dcx8augqwko82" path="res://assets/art/enemies/Slime1/Hurt/Slime1_Hurt_full.png" id="7_d6q7x"]
 [ext_resource type="Texture2D" uid="uid://c0oqu2y7qms6p" path="res://assets/art/enemies/Slime1/Idle/Slime1_Idle_full.png" id="8_yboge"]
@@ -16,16 +12,11 @@
 [ext_resource type="Texture2D" uid="uid://dvprgsx2jfs4g" path="res://assets/art/enemies/Slime2/Run/Slime2_Run_full.png" id="14_o5c4b"]
 [ext_resource type="Texture2D" uid="uid://fucabw6rn88x" path="res://assets/art/enemies/Slime2/Walk/Slime2_Walk_full.png" id="15_8vsca"]
 [ext_resource type="Texture2D" uid="uid://v72hnjrpgyod" path="res://assets/art/enemies/Slime3/Death/Slime3_Death_full.png" id="16_t1d66"]
+[ext_resource type="PackedScene" uid="uid://dc0bdvq04yd5d" path="res://scenes/characters/player.tscn" id="17_o5c4b"]
 [ext_resource type="Texture2D" uid="uid://bcy3ag2divpve" path="res://assets/art/enemies/Slime3/Hurt/Slime3_Hurt_full.png" id="17_qumi6"]
 [ext_resource type="Texture2D" uid="uid://cttaefvo1fv6y" path="res://assets/art/enemies/Slime3/Idle/Slime3_Idle_full.png" id="18_o5c4b"]
 [ext_resource type="Texture2D" uid="uid://ck02c4d8t1kkf" path="res://assets/art/enemies/Slime3/Run/Slime3_Run_full.png" id="19_7ky1q"]
 [ext_resource type="Texture2D" uid="uid://bu1cu8ui78tgg" path="res://assets/art/enemies/Slime3/Walk/Slime3_Walk_full.png" id="20_w84mu"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_sa51r"]
-size = Vector2(17.263, 17.3679)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_pdxp7"]
-size = Vector2(19.7312, 19.8418)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xh7rh"]
 size = Vector2(1367, 28)
@@ -3449,41 +3440,6 @@ animations = [{
 
 [node name="testSpace" type="Node2D"]
 
-[node name="Player" type="CharacterBody2D" parent="."]
-scale = Vector2(-0.389016, 0.518581)
-motion_mode = 1
-script = ExtResource("1_gnttm")
-Speed = 100.0
-PushDamping = 6.0
-
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
-scale = Vector2(1.55208, 1.26806)
-texture = ExtResource("2_q1j2t")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-position = Vector2(-4.59657e-06, 21.2117)
-rotation = -3.14159
-scale = Vector2(3.87159, 5.55143)
-shape = SubResource("RectangleShape2D_sa51r")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Player"]
-position = Vector2(-1.15677e-06, -46.2801)
-rotation = -3.14159
-scale = Vector2(1.82393, 1.55497)
-shape = SubResource("RectangleShape2D_pdxp7")
-
-[node name="Camera2D" type="Camera2D" parent="Player"]
-position_smoothing_enabled = true
-position_smoothing_speed = 1.0
-
-[node name="HealthComponent" parent="Player" instance=ExtResource("3_xh7rh")]
-MaxHealth = 2131
-
-[node name="Sword" parent="Player" instance=ExtResource("4_q1j2t")]
-position = Vector2(-71.9765, 40.4951)
-rotation = -3.58316
-scale = Vector2(-11.893, -0.054)
-
 [node name="Wall" type="Node2D" parent="."]
 top_level = true
 position = Vector2(35, -3)
@@ -3557,8 +3513,8 @@ color = Color(0.479196, 0.386167, 0.464454, 1)
 [node name="Enemys" type="Node2D" parent="."]
 
 [node name="Enemy" parent="Enemys" instance=ExtResource("4_6qhfl")]
-position = Vector2(-269, -227)
-scale = Vector2(2.70441, 2.70441)
+position = Vector2(565, 349)
+scale = Vector2(1.50441, 1.50441)
 collision_layer = 3
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemys/Enemy"]
@@ -3566,8 +3522,8 @@ sprite_frames = SubResource("SpriteFrames_f5omj")
 animation = &"hurt_down"
 
 [node name="Enemy2" parent="Enemys" instance=ExtResource("4_6qhfl")]
-position = Vector2(-311, -103)
-scale = Vector2(1.77285, 2.027)
+position = Vector2(-526, 354)
+scale = Vector2(1.504, 1.504)
 collision_layer = 3
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemys/Enemy2"]
@@ -3575,10 +3531,13 @@ sprite_frames = SubResource("SpriteFrames_jdex6")
 animation = &"walk_down"
 
 [node name="Enemy3" parent="Enemys" instance=ExtResource("4_6qhfl")]
-position = Vector2(-222, -147)
-scale = Vector2(2.70441, 2.70441)
+position = Vector2(-392, 352)
+scale = Vector2(1.504, 1.504)
 collision_layer = 3
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemys/Enemy3"]
 sprite_frames = SubResource("SpriteFrames_pj5af")
 animation = &"walk_down"
+
+[node name="Player" parent="." instance=ExtResource("17_o5c4b")]
+position = Vector2(14, 297)

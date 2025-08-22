@@ -1,0 +1,73 @@
+[gd_scene load_steps=10 format=3 uid="uid://dc0bdvq04yd5d"]
+
+[ext_resource type="Script" uid="uid://clye1dgni81as" path="res://scripts/nodes/Player.cs" id="1_dyp2m"]
+[ext_resource type="Texture2D" uid="uid://dgm84p11c3g8a" path="res://assets/art/characters/character.png" id="2_atpat"]
+[ext_resource type="PackedScene" uid="uid://syfx5i5j0p4u" path="res://scenes/components/health_component.tscn" id="3_kqtwu"]
+[ext_resource type="PackedScene" uid="uid://cock6clpknbx3" path="res://scenes/characters/sword.tscn" id="4_6eyoc"]
+[ext_resource type="PackedScene" uid="uid://d25238rjltyjg" path="res://scenes/components/hurtbox.tscn" id="5_atpat"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eojnx"]
+size = Vector2(17.263, 17.3679)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qgnko"]
+size = Vector2(19.7312, 19.8418)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kqtwu"]
+size = Vector2(22.735, 13.7056)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6eyoc"]
+size = Vector2(14.4362, 13.6405)
+
+[node name="Player" type="CharacterBody2D" groups=["player"]]
+scale = Vector2(-0.389016, 0.518581)
+script = ExtResource("1_dyp2m")
+Speed = 100.0
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(1.55208, 1.26806)
+texture = ExtResource("2_atpat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-4.59657e-06, 21.2117)
+rotation = -3.14159
+scale = Vector2(3.89185, 5.55143)
+shape = SubResource("RectangleShape2D_eojnx")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+position = Vector2(-1.15677e-06, -46.2801)
+rotation = -3.14159
+scale = Vector2(1.82393, 1.55497)
+shape = SubResource("RectangleShape2D_qgnko")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 1.0
+
+[node name="Sword" parent="." instance=ExtResource("4_6eyoc")]
+position = Vector2(-71.9765, 40.4951)
+rotation = -3.58316
+scale = Vector2(-11.893, -0.054)
+
+[node name="Hitbox" parent="Sword" index="1"]
+process_mode = 0
+
+[node name="Hurtbox" parent="." instance=ExtResource("5_atpat")]
+scale = Vector2(2.48523, 2.25492)
+collision_layer = 4
+collision_mask = 4
+
+[node name="CollisionShape2D" parent="Hurtbox" index="0"]
+position = Vector2(-1.5298e-06, 9.37781)
+scale = Vector2(1.17102, 3.11015)
+shape = SubResource("RectangleShape2D_kqtwu")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(-5.84904e-07, -20.4607)
+shape = SubResource("RectangleShape2D_6eyoc")
+debug_color = Color(0, 0.635294, 0.4, 0.419608)
+
+[node name="HealthComponent" parent="." instance=ExtResource("3_kqtwu")]
+
+[editable path="Sword"]
+[editable path="Sword/Hitbox"]
+[editable path="Hurtbox"]

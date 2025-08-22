@@ -5,6 +5,9 @@ public partial class Hitbox : Area2D
 {
     [Export]
     public int Damage = 10;
+    [Export]
+    public float Duration = 0.2f;
+
 
     public override void _Ready()
     {
@@ -32,9 +35,10 @@ public partial class Hitbox : Area2D
         // ...existing code...
     }
 
-    public void Enable(float duration = 0.2f)
+    //public void Enable(float duration = 0.2f)
+    public void Enable()
     {
         Monitoring = true;
-        GetTree().CreateTimer(duration).Timeout += () => Monitoring = false;
+        GetTree().CreateTimer(Duration).Timeout += () => Monitoring = false;
     }
 }

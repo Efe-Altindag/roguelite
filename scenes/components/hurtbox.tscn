@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://d25238rjltyjg"]
+
+[ext_resource type="Script" uid="uid://h711qlsmstkf" path="res://scripts/components/Hurtbox.cs" id="1_g4jrb"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mahlx"]
+radius = 3.9087
+
+[node name="Hurtbox" type="Area2D"]
+scale = Vector2(0.642099, 0.642099)
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("1_g4jrb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 1.13636)
+scale = Vector2(3.29299, 3.47348)
+shape = SubResource("CircleShape2D_mahlx")
+debug_color = Color(0, 0.636832, 0.399909, 0.42)

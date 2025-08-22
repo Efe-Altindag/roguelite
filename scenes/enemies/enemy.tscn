@@ -1,36 +1,54 @@
-[gd_scene load_steps=6 format=3 uid="uid://ottrnuqhf5um"]
+[gd_scene load_steps=7 format=3 uid="uid://ottrnuqhf5um"]
 
 [ext_resource type="PackedScene" uid="uid://syfx5i5j0p4u" path="res://scenes/components/health_component.tscn" id="1_7k104"]
 [ext_resource type="Script" uid="uid://dptnsfromxx2i" path="res://scripts/nodes/Enemy.cs" id="1_lu5c6"]
-[ext_resource type="Script" uid="uid://h711qlsmstkf" path="res://scripts/components/Hurtbox.cs" id="3_qi2p4"]
+[ext_resource type="PackedScene" uid="uid://d25238rjltyjg" path="res://scenes/components/hurtbox.tscn" id="3_38ino"]
+[ext_resource type="PackedScene" uid="uid://dcn80y463q3dc" path="res://scenes/components/enemy_attack_hitbox.tscn" id="4_fcftc"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_4gyqm"]
-radius = 3.9087
+[sub_resource type="CircleShape2D" id="CircleShape2D_38ino"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fcftc"]
 size = Vector2(18.8421, 19.2105)
 
 [node name="Enemy" type="CharacterBody2D"]
 scale = Vector2(0.504411, 0.504411)
-motion_mode = 1
 script = ExtResource("1_lu5c6")
-FollowSpeed = 60.0
+TargetSpeed = 80.0
 
-[node name="HealthComponent" parent="." instance=ExtResource("1_7k104")]
-MaxHealth = 50
+[node name="Hitbox" parent="." instance=ExtResource("4_fcftc")]
+process_mode = 3
+scale = Vector2(-10.9197, -10.9197)
+collision_layer = 4
+collision_mask = 4
 
-[node name="Hurtbox" type="Area2D" parent="."]
-scale = Vector2(0.88, 0.88)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_qi2p4")
+[node name="CollisionShape2D" parent="Hitbox" index="0"]
+position = Vector2(0, 1.49012e-08)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
-position = Vector2(0, 1.13636)
-scale = Vector2(3.29299, 3.47348)
-shape = SubResource("CircleShape2D_4gyqm")
+[node name="Hurtbox" parent="." instance=ExtResource("3_38ino")]
+
+[node name="AggroRadius" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AggroRadius"]
+scale = Vector2(-15.0162, -15.0162)
+shape = SubResource("CircleShape2D_38ino")
+debug_color = Color(0.540957, 0.532839, 0.53904, 0.42)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0.458329, 0.700006)
 scale = Vector2(0.791666, 0.759999)
 shape = SubResource("RectangleShape2D_fcftc")
+
+[node name="AttackCooldownTimer" type="Timer" parent="."]
+wait_time = 1.5
+one_shot = true
+
+[node name="HealthComponent" parent="." instance=ExtResource("1_7k104")]
+MaxHealth = 50
+
+[connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]
+[connection signal="area_exited" from="Hitbox" to="." method="_on_hitbox_area_exited"]
+[connection signal="body_entered" from="AggroRadius" to="." method="_on_aggro_radius_body_entered"]
+[connection signal="body_exited" from="AggroRadius" to="." method="_on_aggro_radius_body_exited"]
+
+[editable path="Hitbox"]
+[editable path="Hurtbox"]

@@ -6,12 +6,12 @@ public partial class Player : CharacterBody2D
     [Export]
     public float Speed = 200f;
     [Export]
-    public float PushForce = 800f; // Force applied to push enemies
+    public float Gravity = 900f;
     [Export]
-    public float PushDamping = 5f; // How fast push effects decay
+    public float JumpVelocity = -400f;
     
-    private Vector2 _pushVelocity = Vector2.Zero; // Accumulated external forces
     private Hitbox _attackHitbox;
+    private Vector2 _velocity = Vector2.Zero;
 
     public override void _Ready()
     {
@@ -47,6 +47,16 @@ public partial class Player : CharacterBody2D
             GD.Print("Player: Sword node not found as a child.");
         }
 
+        var healthComponent = GetNodeOrNull<HealthComponent>("HealthComponent");
+        if (healthComponent != null)
+        {
+            healthComponent.Died += OnPlayerDied;
+        }
+        else
+        {
+            GD.PrintErr("Player: HealthComponent node named 'HealthComponent' not found as a child.");
+        }
+
     }
 
     private void Attack()
@@ -56,7 +66,7 @@ public partial class Player : CharacterBody2D
         if (_attackHitbox != null)
         {
             GD.Print($"Player: Enabling sword hitbox for 0.2s.");
-            _attackHitbox.Enable(0.2f);
+            _attackHitbox.Enable();
         }
         else
         {
@@ -64,8 +74,14 @@ public partial class Player : CharacterBody2D
         }
     }
 
+    private void OnPlayerDied()
+    {
+        GD.Print("Player öldü!");
+        QueueFree(); // veya respawn işlemi
+    }
 
-    private HealthComponent FindHealthComponent(Node node)
+
+    /*private HealthComponent FindHealthComponent(Node node)
     {
         if (node is HealthComponent direct)
             return direct;
@@ -85,59 +101,37 @@ public partial class Player : CharacterBody2D
         }
 
         return null;
-    }
+    }*/
     public override void _PhysicsProcess(double delta)
     {
-        Vector2 velocity = Vector2.Zero;
+        // Sağa-sola hareket
+        float direction = 0f;
+        if (Input.IsActionPressed("move_right"))
+            direction += 1f;
+        if (Input.IsActionPressed("move_left"))
+            direction -= 1f;
 
+        _velocity.X = direction * Speed;
+
+        // Yerçekimi uygula
+        if (!IsOnFloor())
+            _velocity.Y += Gravity * (float)delta;
+        else
+            _velocity.Y = 0f;
+
+        // Zıplama
+        if (IsOnFloor() && Input.IsActionJustPressed("jump"))
+        {
+            _velocity.Y = JumpVelocity;
+        }
+
+        // Attack input kontrolü
         if (Input.IsActionJustPressed("attack"))
         {
-            GD.Print("Attack input detected!");
             Attack();
         }
 
-        if (Input.IsActionPressed("move_right"))
-            velocity.X += 1;
-        if (Input.IsActionPressed("move_left"))
-            velocity.X -= 1;
-        if (Input.IsActionPressed("move_down"))
-            velocity.Y += 1;
-        if (Input.IsActionPressed("move_up"))
-            velocity.Y -= 1;
-
-        if (velocity.Length() > 0)
-        {
-            velocity = velocity.Normalized() * Speed;
-        }
-
-        // Total velocity = player movement + push effects
-        Velocity = velocity + _pushVelocity;
+        Velocity = _velocity;
         MoveAndSlide();
-
-        // Check collisions and apply push
-        for (int i = 0; i < GetSlideCollisionCount(); i++)
-        {
-            var collision = GetSlideCollision(i);
-            if (collision.GetCollider() is Enemy enemy)
-            {
-                // Calculate push direction (from player to enemy)
-                Vector2 pushDirection = (enemy.GlobalPosition - GlobalPosition);
-                if (pushDirection.Length() < 0.1f) 
-                    pushDirection = Vector2.Right; // Fallback
-                pushDirection = pushDirection.Normalized();
-                
-                // Apply controlled push to enemy
-                enemy.ApplyPush(pushDirection * PushForce * (float)delta);
-            }
-        }
-
-        // Reduce own push effects over time
-        _pushVelocity = _pushVelocity.MoveToward(Vector2.Zero, PushDamping * Speed * (float)delta);
-    }
-
-    // Apply external push forces
-    public void ApplyPush(Vector2 pushVector)
-    {
-        _pushVelocity += pushVector;
     }
 }

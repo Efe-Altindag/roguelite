@@ -1,11 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://cock6clpknbx3"]
+[gd_scene load_steps=3 format=3 uid="uid://cock6clpknbx3"]
 
-[ext_resource type="Script" uid="uid://bre6fdrbppomf" path="res://scripts/components/Hitbox.cs" id="1_74bdg"]
+[ext_resource type="PackedScene" uid="uid://52l5dhb1db83" path="res://scenes/components/player_attack_hitbox.tscn" id="2_exn1v"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_o8xsq"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_o8xsq"]
-size = Vector2(8.27814, 14.7269)
 
 [node name="Sword" type="Node2D"]
 scale = Vector2(1, 0.44)
@@ -16,14 +13,12 @@ position = Vector2(0.25, -5.75)
 scale = Vector2(8.44, 188.662)
 texture = SubResource("CanvasTexture_o8xsq")
 
-[node name="Hitbox" type="Area2D" parent="."]
+[node name="Hitbox" parent="." instance=ExtResource("2_exn1v")]
 position = Vector2(0, -6.81818)
-scale = Vector2(8.4, 187.768)
-collision_layer = 2
-collision_mask = 2
-script = ExtResource("1_74bdg")
+scale = Vector2(0.935494, 5.36364)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(0.0297619, 0.00605194)
-scale = Vector2(0.122238, 0.0682168)
-shape = SubResource("RectangleShape2D_o8xsq")
+[node name="CollisionShape2D" parent="Hitbox" index="0"]
+position = Vector2(0.225957, 0.211863)
+scale = Vector2(0.871725, 2.10169)
+
+[editable path="Hitbox"]

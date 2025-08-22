@@ -5,49 +5,32 @@ using System;
 
 public partial class Enemy : CharacterBody2D
 {
-	public enum State { Patrolling, Following }
+	[Export]
+	public float TargetSpeed = 120f; // Speed when moving towards the target
 
-	[Export]
-	public float PatrolSpeed = 40f;
-	[Export]
-	public float FollowSpeed = 100f;
-	[Export]
-	public float FollowDistance = 200f;
-	[Export]
-	public float StopDistance = 12f;
-	[Export]
-	public float ChangeDirMin = 1.0f;
-	[Export]
-	public float ChangeDirMax = 3.0f;
-	[Export]
-	public float PushResistance = 0.3f; // Enemy resistance to being pushed (0-1)
-	[Export]
-	public float PushDamping = 4f; // How fast push effects decay
-	[Export]
-	public float TurnSpeed = 3f; // Smooth turning speed
-
-	private Vector2 _pushVelocity = Vector2.Zero; // Push effects
 	private Vector2 _smoothDirection = Vector2.Right; // For smooth turning
-	private State _state = State.Patrolling;
-	private Vector2 _direction = Vector2.Right;
-	private double _changeTimer = 0.0;
-	private double _changeInterval = 2.0;
-	private RandomNumberGenerator _rng = new RandomNumberGenerator();
-	private Player? _player;
 	private AnimatedSprite2D? _animatedSprite2D;
 	private HealthComponent? _healthComponent;
+	private CharacterBody2D? _target = null;
+	private Timer? _attackCooldownTimer;
+	private Area2D? _attackHitbox;
+
 	private bool _isHurt = false; // New flag for hurt animation
 	private bool _isDead = false; // New flag for death animation
+	private bool _canAttack = true;
+
+	private System.Collections.Generic.HashSet<Area2D> _playersInHitbox = new();
+
 
 	public override void _Ready()
 	{
-		_rng.Randomize();
-		PickNewDirection();
-		_changeInterval = _rng.RandfRange(ChangeDirMin, ChangeDirMax);
-		_player = FindPlayer();
-		_smoothDirection = _direction; // Initial direction
+		_smoothDirection = Vector2.Right; // Default facing
 		_animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		_healthComponent = GetNode<HealthComponent>("HealthComponent");
+		_attackHitbox = GetNodeOrNull<Area2D>("Hitbox");
+		_attackCooldownTimer = GetNodeOrNull<Timer>("AttackCooldownTimer");
+
+
 		if (_healthComponent != null)
 		{
 			_healthComponent.Died += OnDied;
@@ -56,157 +39,69 @@ public partial class Enemy : CharacterBody2D
 		{
 			_animatedSprite2D.AnimationFinished += OnAnimationFinished;
 		}
-	}
-
-	private void PickNewDirection()
-	{
-		var x = _rng.RandfRange(-1.0f, 1.0f);
-		var y = _rng.RandfRange(-1.0f, 1.0f);
-		var v = new Vector2(x, y);
-		if (v.Length() == 0)
-			v = Vector2.Right;
-		_direction = v.Normalized();
-	}
-
-	private Player? FindPlayer()
-	{
-		var scene = GetTree().GetCurrentScene();
-		if (scene == null)
-			return null;
-		return FindChildNodeRecursive<Player>(scene, "Player");
-	}
-
-	private T? FindChildNodeRecursive<T>(Node root, string name) where T : Node
-	{
-		var direct = root.GetNodeOrNull<T>(name);
-		if (direct != null)
-			return direct;
-
-		foreach (var childObj in root.GetChildren())
+		if (_attackHitbox != null)
 		{
-			if (childObj is Node child)
-			{
-				var found = FindChildNodeRecursive<T>(child, name);
-				if (found != null)
-					return found;
-			}
+			_attackHitbox.AreaEntered += _on_hitbox_area_entered;
 		}
-
-		return null;
+		if (_attackCooldownTimer != null)
+    	{
+        _attackCooldownTimer.Timeout += OnAttackCooldownTimeout;
+    	}
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
 		if (_isDead)
 		{
-			// If dead, stop all movement and animation updates
 			Velocity = Vector2.Zero;
-			_pushVelocity = Vector2.Zero;
 			return;
 		}
 
-		// Try to find player if we don't have it yet
-		if (_player == null)
-			_player = FindPlayer();
+		Vector2 moveVelocity = Velocity;
 
-		// Decide state based on distance to player
-		if (_player != null)
+		// Hedefe yatay eksende yaklaş
+		if (_target != null && GodotObject.IsInstanceValid(_target))
 		{
-			var dist = GlobalPosition.DistanceTo(_player.GlobalPosition);
-			_state = dist <= FollowDistance ? State.Following : State.Patrolling;
-		}
-
-		Vector2 velocity = Vector2.Zero;
-
-		if (_state == State.Patrolling)
-		{
-			_changeTimer += delta;
-			if (_changeTimer >= _changeInterval)
+			float dx = _target.GlobalPosition.X - GlobalPosition.X;
+			if (Mathf.Abs(dx) > 5f) // Minimum mesafe
 			{
-				PickNewDirection();
-				_changeTimer = 0.0;
-				_changeInterval = _rng.RandfRange(ChangeDirMin, ChangeDirMax);
+				moveVelocity.X = Mathf.Sign(dx) * TargetSpeed;
 			}
-			// Smoothly turn toward patrol direction so animations reflect facing
-			var targetDir = _direction;
-			_smoothDirection = _smoothDirection.MoveToward(targetDir, TurnSpeed * (float)delta);
-			velocity = _smoothDirection * PatrolSpeed;
-		}
-		else // Following
-		{
-			if (_player != null)
+			else
 			{
-				var toPlayer = _player.GlobalPosition - GlobalPosition;
-				var distToPlayer = toPlayer.Length();
-				if (distToPlayer <= StopDistance)
-				{
-					// Too close: slow down
-					var targetDir = toPlayer.Normalized();
-					_smoothDirection = _smoothDirection.MoveToward(targetDir, TurnSpeed * (float)delta);
-					velocity = _smoothDirection * (FollowSpeed * 0.3f); // Slow approach
-				}
-				else
-				{
-					// Normal following: smooth turning
-					var targetDir = toPlayer.Normalized();
-					_smoothDirection = _smoothDirection.MoveToward(targetDir, TurnSpeed * (float)delta);
-					velocity = _smoothDirection * FollowSpeed;
-				}
+				moveVelocity.X = 0f;
 			}
 		}
+		else
+		{
+			moveVelocity.X = 0f;
+		}
 
-		// Total velocity = AI movement + push effects
-		Velocity = velocity + _pushVelocity;
+		// Yerçekimi uygula
+		if (!IsOnFloor())
+			moveVelocity.Y += 900f * (float)delta; // Gravity sabit
+		else
+			moveVelocity.Y = 0f;
+
+		Velocity = moveVelocity;
 		MoveAndSlide();
 
-		// Collision control and counter-push
-		for (int i = 0; i < GetSlideCollisionCount(); i++)
-		{
-			var collision = GetSlideCollision(i);
-			if (collision.GetCollider() is Player player)
-			{
-				// Apply light counter-push to player
-				Vector2 pushDirection = (player.GlobalPosition - GlobalPosition);
-				if (pushDirection.Length() < 0.1f) 
-					pushDirection = Vector2.Left; // Fallback
-				pushDirection = pushDirection.Normalized();
-				
-				player.ApplyPush(pushDirection * 60f * (float)delta); // Lighter force
-			}
-		}
-
-		// Reduce push effects over time
-		_pushVelocity = _pushVelocity.MoveToward(Vector2.Zero, PushDamping * FollowSpeed * (float)delta);
 		UpdateAnimation();
 	}
 
 	private void UpdateAnimation()
 	{
 		if (_animatedSprite2D == null || _isHurt || _isDead) return;
-
-		string animPrefix = "";
-		float currentSpeed = Velocity.Length();
 		
-		if (_state == State.Patrolling)
-		{
-			animPrefix = currentSpeed > 5f ? "walk" : "idle";
-		}
-		else // Following
-		{
-			if (currentSpeed > 5f)
-			{
-				// Use run animation when following and moving fast
-				animPrefix = "run";
-			}
-			else
-			{
-				animPrefix = "idle";
-			}
-		}
-
-		string directionSuffix = GetDirectionSuffix(_smoothDirection);
+		// Determine animation based on actual movement
+		Vector2 currentVelocity = Velocity;
+		string animPrefix = currentVelocity.Length() > 10f ? "walk" : "idle";
+		
+		// Use movement direction for animation facing
+		Vector2 facingDirection = currentVelocity.Length() > 5f ? currentVelocity : _smoothDirection;
+		string directionSuffix = GetDirectionSuffix(facingDirection);
 		string animationName = $"{animPrefix}_{directionSuffix}";
-
+		
 		if (_animatedSprite2D.SpriteFrames.HasAnimation(animationName))
 		{
 			if (_animatedSprite2D.Animation != animationName)
@@ -216,12 +111,21 @@ public partial class Enemy : CharacterBody2D
 		}
 		else
 		{
-			// Fallback to idle if animation not found
+			// Fallback to idle animation
 			string fallbackAnim = $"idle_{directionSuffix}";
-			if (_animatedSprite2D.SpriteFrames.HasAnimation(fallbackAnim) && _animatedSprite2D.Animation != fallbackAnim)
+			if (_animatedSprite2D.SpriteFrames.HasAnimation(fallbackAnim))
 			{
-				_animatedSprite2D.Play(fallbackAnim);
+				if (_animatedSprite2D.Animation != fallbackAnim)
+				{
+					_animatedSprite2D.Play(fallbackAnim);
+				}
 			}
+		}
+		
+		// Update smooth direction for consistent facing
+		if (currentVelocity.Length() > 5f)
+		{
+			_smoothDirection = currentVelocity.Normalized();
 		}
 	}
 
@@ -271,12 +175,21 @@ public partial class Enemy : CharacterBody2D
 		}
 	}
 
-	// Apply external push forces
-	public void ApplyPush(Vector2 pushVector)
+	private void OnAnimationFinished()
 	{
-		// Reduce push force with resistance factor
-		Vector2 finalPush = pushVector * (1f - PushResistance);
-		_pushVelocity += finalPush;
+		if (_animatedSprite2D == null) return;
+		
+		string currentAnim = _animatedSprite2D.Animation.ToString();
+		
+		if (currentAnim.StartsWith("death"))
+		{
+			QueueFree();
+		}
+		else if (currentAnim.StartsWith("hurt"))
+		{
+			_isHurt = false;
+			UpdateAnimation(); // Revert to normal animation
+		}
 	}
 
 	private void OnDied()
@@ -305,20 +218,57 @@ public partial class Enemy : CharacterBody2D
 		}
 	}
 
-	private void OnAnimationFinished()
+	private void OnAttackCooldownTimeout()
 	{
-		if (_animatedSprite2D == null) return;
-		
-		string currentAnim = _animatedSprite2D.Animation.ToString();
-		
-		if (currentAnim.StartsWith("death"))
+    	_canAttack = true;
+		int damage = (_attackHitbox as EnemyAttackHitbox)?.Damage ?? 10;
+		foreach (var playerArea in _playersInHitbox)
 		{
-			QueueFree();
+			if (GodotObject.IsInstanceValid(playerArea))
+			{
+				playerArea.Call("TakeDamage", damage);
+				GD.Print($"Düşman, timer sonrası oyuncuya tekrar {damage} hasar verdi!");
+			}
 		}
-		else if (currentAnim.StartsWith("hurt"))
+		if (_playersInHitbox.Count > 0)
 		{
-			_isHurt = false;
-			UpdateAnimation(); // Revert to normal animation
+			_canAttack = false;
+			_attackCooldownTimer?.Start();
+		}
+	}
+	private void _on_hitbox_area_entered(Area2D area)
+	{
+		if (area.GetParent().IsInGroup("player"))
+		{
+			_playersInHitbox.Add(area);
+
+			// Timer bittiyse hemen hasar ver
+			if (_canAttack)
+			{
+				int damage = (_attackHitbox as EnemyAttackHitbox)?.Damage ?? 10;
+				area.Call("TakeDamage", damage);
+				_canAttack = false;
+				_attackCooldownTimer?.Start();
+				GD.Print($"Düşman, oyuncuya {damage} hasar verdi!");
+			}
+		}
+	}
+
+	// Hitbox'tan çıkan player'ı takip et
+	private void _on_hitbox_area_exited(Area2D area)
+	{
+		if (area.GetParent().IsInGroup("player"))
+		{
+			_playersInHitbox.Remove(area);
+		}
+	}
+
+
+	private void _on_aggro_radius_body_entered(Node body)
+	{
+		if (body.IsInGroup("player"))
+		{
+			_target = body as CharacterBody2D;
 		}
 	}
 }
