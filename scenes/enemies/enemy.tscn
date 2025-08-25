@@ -12,21 +12,26 @@ size = Vector2(18.8421, 19.2105)
 
 [node name="Enemy" type="CharacterBody2D"]
 scale = Vector2(0.504411, 0.504411)
+collision_layer = 4
+collision_mask = 7
 script = ExtResource("1_lu5c6")
-TargetSpeed = 80.0
+TargetSpeed = 65.0
 
 [node name="Hitbox" parent="." instance=ExtResource("4_fcftc")]
 process_mode = 3
 scale = Vector2(-10.9197, -10.9197)
-collision_layer = 4
-collision_mask = 4
+collision_layer = 16
+collision_mask = 32
 
 [node name="CollisionShape2D" parent="Hitbox" index="0"]
 position = Vector2(0, 1.49012e-08)
 
 [node name="Hurtbox" parent="." instance=ExtResource("3_38ino")]
+collision_layer = 64
+collision_mask = 8
 
 [node name="AggroRadius" type="Area2D" parent="."]
+collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AggroRadius"]
 scale = Vector2(-15.0162, -15.0162)

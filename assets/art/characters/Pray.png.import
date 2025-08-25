@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dgm84p11c3g8a"
-path="res://.godot/imported/character.png-999bfd681c17b46dc990d2780e54d2d6.ctex"
+uid="uid://bbv63vfrs3vse"
+path="res://.godot/imported/Pray.png-b2dfd1e22e408a4b4b8f583251ab6734.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/characters/character.png"
-dest_files=["res://.godot/imported/character.png-999bfd681c17b46dc990d2780e54d2d6.ctex"]
+source_file="res://assets/art/characters/Pray.png"
+dest_files=["res://.godot/imported/Pray.png-b2dfd1e22e408a4b4b8f583251ab6734.ctex"]
 
 [params]
 

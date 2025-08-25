@@ -3446,6 +3446,8 @@ position = Vector2(35, -3)
 
 [node name="walls2" type="StaticBody2D" parent="Wall"]
 position = Vector2(20, 670)
+collision_layer = 2
+collision_mask = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall/walls2"]
 position = Vector2(-75, -270)
@@ -3463,6 +3465,8 @@ color = Color(0.479196, 0.386167, 0.464454, 1)
 [node name="walls3" type="StaticBody2D" parent="Wall"]
 position = Vector2(-502, 45)
 rotation = -1.5708
+collision_layer = 2
+collision_mask = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall/walls3"]
 position = Vector2(-80.5, -263)
@@ -3480,6 +3484,8 @@ color = Color(0.479196, 0.386167, 0.464454, 1)
 [node name="walls4" type="StaticBody2D" parent="Wall"]
 position = Vector2(917, -41)
 rotation = -1.5708
+collision_layer = 2
+collision_mask = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall/walls4"]
 position = Vector2(-77, -270)
@@ -3496,6 +3502,8 @@ color = Color(0.479196, 0.386167, 0.464454, 1)
 
 [node name="walls" type="StaticBody2D" parent="Wall"]
 position = Vector2(23, -103)
+collision_layer = 2
+collision_mask = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Wall/walls"]
 position = Vector2(-73, -262)
@@ -3515,7 +3523,6 @@ color = Color(0.479196, 0.386167, 0.464454, 1)
 [node name="Enemy" parent="Enemys" instance=ExtResource("4_6qhfl")]
 position = Vector2(565, 349)
 scale = Vector2(1.50441, 1.50441)
-collision_layer = 3
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemys/Enemy"]
 sprite_frames = SubResource("SpriteFrames_f5omj")
@@ -3524,7 +3531,6 @@ animation = &"hurt_down"
 [node name="Enemy2" parent="Enemys" instance=ExtResource("4_6qhfl")]
 position = Vector2(-526, 354)
 scale = Vector2(1.504, 1.504)
-collision_layer = 3
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemys/Enemy2"]
 sprite_frames = SubResource("SpriteFrames_jdex6")
@@ -3533,11 +3539,12 @@ animation = &"walk_down"
 [node name="Enemy3" parent="Enemys" instance=ExtResource("4_6qhfl")]
 position = Vector2(-392, 352)
 scale = Vector2(1.504, 1.504)
-collision_layer = 3
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemys/Enemy3"]
 sprite_frames = SubResource("SpriteFrames_pj5af")
 animation = &"walk_down"
 
 [node name="Player" parent="." instance=ExtResource("17_o5c4b")]
-position = Vector2(14, 297)
+position = Vector2(14, 304)
+scale = Vector2(-0.715334, 0.953582)
+Speed = 150.0

@@ -16,6 +16,8 @@ texture = SubResource("CanvasTexture_o8xsq")
 [node name="Hitbox" parent="." instance=ExtResource("2_exn1v")]
 position = Vector2(0, -6.81818)
 scale = Vector2(0.935494, 5.36364)
+collision_layer = 8
+collision_mask = 64
 
 [node name="CollisionShape2D" parent="Hitbox" index="0"]
 position = Vector2(0.225957, 0.211863)

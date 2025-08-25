@@ -8,37 +8,52 @@ public partial class Hitbox : Area2D
     [Export]
     public float Duration = 0.2f;
 
+    // DEĞİŞTİ: Artık CollisionShape'i doğrudan kontrol etmek daha temiz bir yöntem.
+    private CollisionShape2D _collisionShape;
 
     public override void _Ready()
     {
-        Monitoring = false;
-        Connect("body_entered", new Callable(this, nameof(OnBodyEntered)));
+        // CollisionShape'i başlangıçta kapalı tutalım.
+        _collisionShape = GetNode<CollisionShape2D>("CollisionShape2D");
+        _collisionShape.Disabled = true;
+
+        // DOĞRU SİNYAL: `area_entered` sinyaline bağlanıyoruz.
+        Connect("area_entered", new Callable(this, nameof(OnAreaEntered)));
     }
 
-    private void OnBodyEntered(Node body)
+    // YENİ METOD: `area_entered` sinyali bu metodu çağıracak.
+    private void OnAreaEntered(Area2D area)
     {
-        GD.Print($"Hitbox: body entered: {body.Name} ({body.GetType().Name})");
-        Hurtbox hurtbox = null;
-        // Çarpışan body'sinin çocuklarında Area2D tipinde ve Hurtbox scriptli node ara
-        foreach (var childObj in body.GetChildren())
+        // Çarptığımız alan bir Hurtbox mı diye kontrol ediyoruz.
+        if (area is Hurtbox hurtbox)
         {
-            if (childObj is Hurtbox h)
-            {
-                hurtbox = h;
-                break;
-            }
-        }
-        if (hurtbox != null)
-        {
+            GD.Print($"Hitbox, bir Hurtbox algıladı: {hurtbox.Name}");
+            // Doğrudan Hurtbox'ın TakeDamage metodunu çağırıyoruz.
             hurtbox.TakeDamage(Damage);
         }
-        // ...existing code...
     }
 
-    //public void Enable(float duration = 0.2f)
+    // ESKİ METOD SİLİNDİ: OnBodyEntered artık kullanılmıyor.
+
+    // DEĞİŞTİ: Enable metodu artık Monitoring yerine CollisionShape'i açıp kapatacak.
     public void Enable()
     {
-        Monitoring = true;
-        GetTree().CreateTimer(Duration).Timeout += () => Monitoring = false;
+        _collisionShape.Disabled = false;
+        // Belirlenen süre sonunda CollisionShape'i tekrar kapat.
+        GetTree().CreateTimer(Duration).Timeout += () =>
+        {
+            if (GodotObject.IsInstanceValid(this))
+            {
+                _collisionShape.Disabled = true;
+            }
+        };
+    }
+    public void Disable()
+    {
+        if (_collisionShape != null)
+        {
+            _collisionShape.Disabled = true;
+        }
     }
 }
+

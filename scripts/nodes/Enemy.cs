@@ -44,9 +44,9 @@ public partial class Enemy : CharacterBody2D
 			_attackHitbox.AreaEntered += _on_hitbox_area_entered;
 		}
 		if (_attackCooldownTimer != null)
-    	{
-        _attackCooldownTimer.Timeout += OnAttackCooldownTimeout;
-    	}
+		{
+			_attackCooldownTimer.Timeout += OnAttackCooldownTimeout;
+		}
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -92,16 +92,16 @@ public partial class Enemy : CharacterBody2D
 	private void UpdateAnimation()
 	{
 		if (_animatedSprite2D == null || _isHurt || _isDead) return;
-		
+
 		// Determine animation based on actual movement
 		Vector2 currentVelocity = Velocity;
 		string animPrefix = currentVelocity.Length() > 10f ? "walk" : "idle";
-		
+
 		// Use movement direction for animation facing
 		Vector2 facingDirection = currentVelocity.Length() > 5f ? currentVelocity : _smoothDirection;
 		string directionSuffix = GetDirectionSuffix(facingDirection);
 		string animationName = $"{animPrefix}_{directionSuffix}";
-		
+
 		if (_animatedSprite2D.SpriteFrames.HasAnimation(animationName))
 		{
 			if (_animatedSprite2D.Animation != animationName)
@@ -121,7 +121,7 @@ public partial class Enemy : CharacterBody2D
 				}
 			}
 		}
-		
+
 		// Update smooth direction for consistent facing
 		if (currentVelocity.Length() > 5f)
 		{
@@ -147,7 +147,7 @@ public partial class Enemy : CharacterBody2D
 		{
 			return; // Don't play hurt if dead or already hurting
 		}
-		
+
 		_isHurt = true;
 		string directionSuffix = GetDirectionSuffix(_smoothDirection);
 		string hurtAnimationName = $"hurt_{directionSuffix}";
@@ -178,9 +178,9 @@ public partial class Enemy : CharacterBody2D
 	private void OnAnimationFinished()
 	{
 		if (_animatedSprite2D == null) return;
-		
+
 		string currentAnim = _animatedSprite2D.Animation.ToString();
-		
+
 		if (currentAnim.StartsWith("death"))
 		{
 			QueueFree();
@@ -196,7 +196,7 @@ public partial class Enemy : CharacterBody2D
 	{
 		if (_isDead) return; // Prevent multiple death calls
 		_isDead = true;
-		
+
 		if (_animatedSprite2D == null)
 		{
 			QueueFree();
@@ -205,7 +205,7 @@ public partial class Enemy : CharacterBody2D
 
 		string directionSuffix = GetDirectionSuffix(_smoothDirection);
 		string deathAnimationName = $"death_{directionSuffix}";
-		
+
 		if (_animatedSprite2D.SpriteFrames.HasAnimation(deathAnimationName))
 		{
 			_animatedSprite2D.Stop();
@@ -220,7 +220,7 @@ public partial class Enemy : CharacterBody2D
 
 	private void OnAttackCooldownTimeout()
 	{
-    	_canAttack = true;
+		_canAttack = true;
 		int damage = (_attackHitbox as EnemyAttackHitbox)?.Damage ?? 10;
 		foreach (var playerArea in _playersInHitbox)
 		{
@@ -270,5 +270,13 @@ public partial class Enemy : CharacterBody2D
 		{
 			_target = body as CharacterBody2D;
 		}
+	}
+	private void _on_aggro_radius_body_exited(Node body)
+	{
+		if (body.IsInGroup("player"))
+		{
+			_target = null;
+		}
+
 	}
 }
